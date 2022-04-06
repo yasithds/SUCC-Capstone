@@ -1,3 +1,5 @@
+// TEAM SUCC - Control Arduino 1 V1.2
+// Name: Yasith De Silva
 
 #include <LiquidCrystal.h> 
 #include <Stepper.h>

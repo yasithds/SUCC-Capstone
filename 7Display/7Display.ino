@@ -1,6 +1,7 @@
+// TEAM SUCC - Display Arduino 1 V1.2
+// Name: Yasith De Silva
 
 char mystr[10];
-
 
 #define common_cathode 0
 #define common_anode 1
@@ -38,7 +39,7 @@ byte Char[37][9] {
             {1,1,1,1,0,1,1,0,'9'}, //9
             {1,1,1,0,1,1,1,0,'a'},//A/1
             {0,0,1,1,1,1,1,0,'b'},//b/2
-            {0,0,0,1,1,0,1,0,'c'},//C/3
+            {1,0,0,1,1,1,0,0,'c'},//C/3
             {0,1,1,1,1,0,1,0,'d'},//d/4
             {1,0,0,1,1,1,1,0,'e'},//E/5
             {1,0,0,0,1,1,1,0,'f'},//F/6
@@ -88,98 +89,44 @@ void setup(){
 
 //9, 2, 7, 10, 11, 3
 // 6, 5,13 ,4,8, 12
-  
 
 }
 
 void loop(){
+   // printDisplay("succ",1000);// use this function to print a string 
+   //(has numbers, characters or phrases) when the length of string is 4 or less than 4, 
+   //the second variable is the time for printing on display
+
   Serial.readBytes(mystr,4);
   Serial.println(mystr);
   delay(1000);
 
   //printDigit('1',D3);
- printDisplay(mystr,1000);// use this function to print a string (has numbers, characters or phrases) when the length of string is 4 or less than 4, the second variable is the time for printing on display
+  printDisplay(mystr,1000);
+  // use this function to print a string (has numbers, characters or phrases) when the length of 
+  //string is 4 or less than 4, the second variable is the time for printing on display
   Reset();// use this function to reset the display
-  //delay(1000);
-  //printDisplay("all usable characters [[ 1 2 3 4 5 6 7 8 9 0 a b c d e f g h i j l n o p q r s t u y - _ . [ ] ? ]]",300);// when the length of string is more than 4, the second variable is custom speed for movement
+ 
+  //printDisplay("all usable characters 
+  //[[ 1 2 3 4 5 6 7 8 9 0 a b c d e f g h i j l n o p q r s t u y - _ . [ ] ? ]]",300);
+  // when the length of string is more than 4, the second variable is custom speed for movement
   //delay(1000);
   //printDigit('y',D1);//print any char on any digit
   //delay(1000);
-
-/*
-  digitalWrite(D1, LOW);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, HIGH); 
-  //0
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, HIGH);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, HIGH);   
-  digitalWrite(pinG, LOW);   
-  delay(1);               // wait for a second
- 
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, LOW);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, HIGH); 
-  //1
-  digitalWrite(pinA, LOW);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, HIGH);   
-  digitalWrite(pinD, LOW);   
-  digitalWrite(pinE, LOW);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, LOW);   
-  delay(1);               // wait for a second
-  
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, LOW);
-  digitalWrite(D4, HIGH); 
-  //2
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, LOW);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, HIGH);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, HIGH);     
-  delay(1);               // wait for a second
-
-  digitalWrite(D1, HIGH);
-  digitalWrite(D2, HIGH);
-  digitalWrite(D3, HIGH);
-  digitalWrite(D4, LOW); 
-  //3
-  digitalWrite(pinA, HIGH);   
-  digitalWrite(pinB, HIGH);   
-  digitalWrite(pinC, HIGH);   
-  digitalWrite(pinD, HIGH);   
-  digitalWrite(pinE, LOW);   
-  digitalWrite(pinF, LOW);   
-  digitalWrite(pinG, HIGH);     
-  delay(1);               // wait for a second
-  
-*/
 }
 
-void Reset()
-{ digitalWrite(D1, !mode);
+void Reset(){ 
+  digitalWrite(D1, !mode);
   digitalWrite(D2, !mode);
   digitalWrite(D3, !mode);
   digitalWrite(D4, !mode); 
   for(byte i = 0 ; i < 8 ; i++){
-  digitalWrite(seg[i],mode);
+    digitalWrite(seg[i],mode);
   }
 }
 
-
-
-void printDigit(char Chara,int digitPort)
-{ Reset(); 
+void printDigit(char Chara,int digitPort){ 
+  Reset(); 
   int character = -1;
   digitalWrite(digitPort,mode);
   for(int i = 0 ; i < charsInArray ; i++){
@@ -191,79 +138,72 @@ void printDigit(char Chara,int digitPort)
   if (character == -1){
     digitalWrite(pinG,!mode);
   }else{
-for(int i = 0;i<= 7;i++)
-    {if(mode == common_anode) digitalWrite(seg[i],!Char[character][i]);     
+  for(int i = 0;i<= 7;i++){
+    if(mode == common_anode) digitalWrite(seg[i],!Char[character][i]);     
     else if(mode == common_cathode) digitalWrite(seg[i],Char[character][i]);
       
     }
   }
 }
 
-
-
-
-
-void printDisplay(String Phrase,int Delay)
-{
-char char1 = Phrase.charAt(0);
-char char2 = Phrase.charAt(1);
-char char3 = Phrase.charAt(2);
-char char4 = Phrase.charAt(3);
-//char char5 = Phrase.charAt(4);
-char char1Num = 0;
-char char2Num = 0;
-char char3Num = 0;
-char char4Num = 0;
-int stringLength = Phrase.length();
-
-if(stringLength < 5){
-  for(int ti = 0 ; ti <= (Delay / 8) ; ti++){
-  if(1 > stringLength) char1 = ' ';
-  else char1 = Phrase.charAt(0);
-  if(2 > stringLength) char2 = ' ';
-  else char2 = Phrase.charAt(1);
-  if(3 > stringLength) char3 = ' ';
-  else char3 = Phrase.charAt(2);
-  if(4 > stringLength) char4 = ' ';
-  else char4 = Phrase.charAt(3);
- /* Reset();
-  delay(2);*/
-  printDigit(char1,D1);
-  delay(2);
-  printDigit(char2,D2);
-  delay(2);
-  printDigit(char3,D3);
-  delay(2);
-  printDigit(char4,D4);
-  delay(2);
+void printDisplay(String Phrase,int Delay){
+  char char1 = Phrase.charAt(0);
+  char char2 = Phrase.charAt(1);
+  char char3 = Phrase.charAt(2);
+  char char4 = Phrase.charAt(3);
+  //char char5 = Phrase.charAt(4);
+  char char1Num = 0;
+  char char2Num = 0;
+  char char3Num = 0;
+  char char4Num = 0;
+  int stringLength = Phrase.length();
+  
+  if(stringLength < 5){
+    for(int ti = 0 ; ti <= (Delay / 8) ; ti++){
+    if(1 > stringLength) char1 = ' ';
+    else char1 = Phrase.charAt(0);
+    if(2 > stringLength) char2 = ' ';
+    else char2 = Phrase.charAt(1);
+    if(3 > stringLength) char3 = ' ';
+    else char3 = Phrase.charAt(2);
+    if(4 > stringLength) char4 = ' ';
+    else char4 = Phrase.charAt(3);
+   /* Reset();
+    delay(2);*/
+    printDigit(char1,D1);
+    delay(2);
+    printDigit(char2,D2);
+    delay(2);
+    printDigit(char3,D3);
+    delay(2);
+    printDigit(char4,D4);
+    delay(2);
+    }
+  }else{
+  for(int t = 0 ; t <= stringLength ; t++){
+    for(int ti = 0 ; ti <= (Delay / 8) ; ti++){
+  
+      /*Reset();
+      delay(2);*/
+      printDigit(char1,D1);
+      delay(2);
+      printDigit(char2,D2);
+      delay(2);
+      printDigit(char3,D3);
+      delay(2);
+      printDigit(char4,D4);
+      delay(2);
+    }
+    if(t + 1 > stringLength) char1 = ' ';
+    else char1 = Phrase.charAt(t);
+    if((t + 2) > stringLength) char2 = ' ';
+    else char2 = Phrase.charAt(t + 1);
+    if((t + 3) > stringLength) char3 = ' ';
+    else char3 = Phrase.charAt(t + 2);
+    if((t + 4) > stringLength) char4 = ' ';
+    else char4 = Phrase.charAt(t + 3);
+ 
+    }
   }
-}else{
-for(int t = 0 ; t <= stringLength ; t++){
-  for(int ti = 0 ; ti <= (Delay / 8) ; ti++){
-  
-  /*Reset();
-  delay(2);*/
-  printDigit(char1,D1);
-  delay(2);
-  printDigit(char2,D2);
-  delay(2);
-  printDigit(char3,D3);
-  delay(2);
-  printDigit(char4,D4);
-  delay(2);
-}
-  if(t + 1 > stringLength) char1 = ' ';
-  else char1 = Phrase.charAt(t);
-  if((t + 2) > stringLength) char2 = ' ';
-  else char2 = Phrase.charAt(t + 1);
-  if((t + 3) > stringLength) char3 = ' ';
-  else char3 = Phrase.charAt(t + 2);
-  if((t + 4) > stringLength) char4 = ' ';
-  else char4 = Phrase.charAt(t + 3);
-  
-  
-  
-}
-}
 }
   
