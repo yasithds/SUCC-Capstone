@@ -1,10 +1,16 @@
 #include <Wire.h>
-#include <AFMotor.h>
+//#include <AFMotor.h>
 
 #define SLAVE_ADDR 9
 
-AF_Stepper motor1(200,1); //#steps per rev, motor placement on board
-AF_Stepper motor2(200,2);
+//AF_Stepper motor1(200,1); //#steps per rev, motor placement on board
+//AF_Stepper motor2(200,2);
+#define NO_OF_STEPS 200
+#define motor1 2
+#define motor1_dir 5
+#define motor2 3
+#define motor2_dir 6
+
 
 String data ="";
 int angle =0;
@@ -15,14 +21,20 @@ int indexAngle=0;
 
 void setup() {
   // put your setup code here, to run once:
+  pinMode(motor1,OUTPUT);
+  pinMode(motor2,OUTPUT);
+  pinMode(motor1_dir, OUTPUT);
+  pinMode(motor2_dir, OUTPUT);
+
+     
 Serial.begin (9600);
 Wire.begin(SLAVE_ADDR); //I2C as slave
 
 Wire.onReceive(receiveEvent);
 Wire.onRequest(requestEvent);
 
-motor1.setSpeed(100);
-motor2.setSpeed(100);
+//motor1.setSpeed(100);
+//motor2.setSpeed(100);
 }
 
 void requestEvent(){
@@ -45,6 +57,16 @@ void receiveEvent(int howMany){
   //angle = data.toInt();
   
   if (action == 1){ //motor 1 = tilt
+
+   for(int x = 0; x<200; x++) { // loop for 200 steps
+  digitalWrite(motor1,HIGH);
+  delayMicroseconds(500);
+  digitalWrite(motor1,LOW); 
+  delayMicroseconds(500);
+ }
+
+
+   
     stepNum = map(c, -90, 90, (-200/4)*ratio, (200/4)*ratio);
     if (stepNum >= tilt && stepNum+tilt <= ratio){ //50* (1:40) from gearing
       
@@ -52,23 +74,23 @@ void receiveEvent(int howMany){
     Serial.println(angle);
     Serial.print("steps: ");
     Serial.println(stepNum);
-    motor1.step(stepNum-tilt, FORWARD, SINGLE);
+   // motor1.step(stepNum-tilt, FORWARD, SINGLE);
     tilt = stepNum - tilt;
     
     } else if (stepNum >= tilt && stepNum+tilt >= ratio){
-      motor1.step(ratio - tilt, FORWARD, SINGLE);
+     // motor1.step(ratio - tilt, FORWARD, SINGLE);
       tilt = ratio;
       
     } else if (stepNum>0 && stepNum < tilt && stepNum+tilt <= -ratio){
-      motor1.step(stepNum, BACKWARD, SINGLE);
+      //motor1.step(stepNum, BACKWARD, SINGLE);
       tilt = tilt - stepNum;  
     } else if (stepNum < tilt && stepNum+tilt <= -ratio){
-      motor1.step(tilt, BACKWARD, SINGLE);
+      //motor1.step(tilt, BACKWARD, SINGLE);
       tilt = 0; 
     }
 
       
-    motor1.step(stepNum+tilt, BACKWARD, SINGLE);
+    //motor1.step(stepNum+tilt, BACKWARD, SINGLE);
     tilt += stepNum;
     
     Serial.print("Current Tilt: ");
@@ -82,7 +104,7 @@ void receiveEvent(int howMany){
     stepNum = (200/c) * ratio;
   } else {
     // Continue with current index
-     motor2.step(stepNum, FORWARD, SINGLE);
+    // motor2.step(stepNum, FORWARD, SINGLE);
   }
 } 
 
@@ -97,5 +119,6 @@ void loop() {
   delay(200);
   // motor2.step(200, FORWARD, SINGLE);
   //Serial.println(data);
-  delay(200);
+
+  delay(1000);
 }
