@@ -5,12 +5,16 @@
 
 LiquidCrystal_I2C lcd(0x27,20,4); 
 
+#define SLAVE_ADDR 9
+
 int menuCounter = 0; //counts the clicks of the rotary encoder between menu items (0-3 in this case)
 
 int menu1_Value = 0; //value within menu 1
 int menu2_Value = 0; //value within menu 2
 int menu3_Value = 0; //value within menu 3
 int menu4_Value = 0; //value within menu 4
+
+int index_type =0; //0- angle, 1- number per 360
 
 bool menu1_selected = false; //enable/disable to change the value of menu item
 bool menu2_selected = false;
@@ -34,8 +38,27 @@ int DTPrevious;
 bool refreshLCD = true; //refreshes values
 bool refreshSelection = false; //refreshes selection (> / X)
 
+const byte nb_rows = 4;                         // four rows
+const byte nb_cols = 4;                         // four columns
+char key_chars[nb_rows][nb_cols] = {            // The symbols of the keys
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+
+byte rowPins[nb_rows] = {5, 4, 11, 10};             // The pins where the rows are connected
+byte colPins[nb_cols] = {9, 8, 7, 6};         // The pins where the columns are connected
+
+
+/* initialize an instance of class NewKeypad */
+SimpleKeypad kp1((char*)key_chars, rowPins, colPins, nb_rows, nb_cols);   // New keypad called kp1
+
 void setup() 
 {
+  Wire.begin(); //starts i2c as master
+
+
   pinMode(RotaryCLK, INPUT_PULLUP); //RotaryCLK
   pinMode(RotaryDT, INPUT_PULLUP); //RotaryDT
   pinMode(PushButton, INPUT_PULLUP); //Button
@@ -50,7 +73,7 @@ void setup()
   lcd.setCursor(0,1);
   lcd.print("        SUCC");
   lcd.setCursor(0,2);            
-  lcd.print("  DIGITAL  INDEXING");
+  lcd.print("  DIGITAL INDEXING");
   lcd.setCursor(0,3);             
   //lcd.print("Press to wake");  
   delay(5000); //wait 2 sec
@@ -66,6 +89,8 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(RotaryCLK), rotate, CHANGE); //CLK pin is an interrupt pin
   attachInterrupt(digitalPinToInterrupt(PushButton), pushButton, FALLING); //PushButton pin is an interrupt pin
 
+    // Setup Serial Monitor
+  Serial.begin (9600);
 }
 
 void loop() 
@@ -92,6 +117,22 @@ void loop()
     updateSelection(); //update the selection on the LCD
     refreshSelection = false; // reset the variable - wait for a new trigger
   }
+
+  
+  char key = kp1.getKey();                      // The getKey function scans the keypad every 10 ms and returns a key only one time, when you start pressing it
+  if (key) {                                    // If getKey returned any key
+    Serial.println(key);                        // it is printed on the serial monitor   
+  }
+  if (key=='*' && index_type ==0){
+    lcd.setCursor(1,2);            
+    lcd.print("Index Amount");
+    index_type=1; 
+  }else if (key=='*' && index_type ==1){
+    lcd.setCursor(1,2);            
+    lcd.print("Index Angle ");
+    index_type=0; 
+  }
+  
 }
 
 void rotate()
@@ -142,7 +183,7 @@ void rotate()
   {
     // If the DT state is different than the CLK state then
     // the encoder is rotating in A direction, so we increase
-    if (digitalRead(RotaryDT) != CLKNow) 
+    if (digitalRead(RotaryDT) == CLKNow) 
     {
       if(menu2_Value < 100) //we do not go above 100
       {
@@ -236,7 +277,7 @@ void rotate()
       }      
     }    
   }
-  CLKPrevious = CLKNow;  // Store last CLK state
+  CLKPrevious = CLKNow;  // Store last CLK state 
   }
   else //MENU COUNTER----------------------------------------------------------------------------
   {
@@ -248,20 +289,20 @@ void rotate()
     // the encoder is rotating in A direction, so we increase
     if (digitalRead(RotaryDT) == CLKNow) 
     {
-      if(menuCounter < 2) //we do not go above 3
+      if(menuCounter < 3) //we do not go above 3
       {
         menuCounter++;  
       }
       else
       {
-        menuCounter = 1;  
+        menuCounter = 1;  //dont use 0 because "menu"
       }      
     } 
     else 
     {
       if(menuCounter < 2) //we do not go below 0
       {
-          menuCounter = 2;
+          menuCounter = 3;
       }
       else
       {
@@ -316,21 +357,21 @@ void printLCD(){
   lcd.print("Index Angle"); //text
   //----------------------
   lcd.setCursor(1,3); //4th line, 2nd block
-  lcd.print("CONFIRM"); //text
+  lcd.print("Confirm"); //text
   //----------------------
-  lcd.setCursor(15,0); //1st line, 14th block
-  lcd.print("cnt: "); //counts - text
+ // lcd.setCursor(15,0); //1st line, 14th block
+ // lcd.print("cnt: "); //counts - text
 }
 
 void updateLCD(){
     
-  lcd.setCursor(19,0); //1st line, 18th block
-  lcd.print(menuCounter); //counter (0 to 3)
+  //lcd.setCursor(19,0); //1st line, 18th block
+ // lcd.print(menuCounter); //counter (0 to 3)
 
   lcd.setCursor(15,0); //1st line, 10th block
   lcd.print("   "); //erase the content by printing space over it
-  lcd.setCursor(15,0); //1st line, 10th block
-  lcd.print(menu1_Value); //print the value of menu1_Value variable
+ // lcd.setCursor(15,0); //1st line, 10th block
+ // lcd.print(menu1_Value); //print the value of menu1_Value variable
 
   lcd.setCursor(15,1);
   lcd.print("   ");
@@ -344,8 +385,8 @@ void updateLCD(){
 
   lcd.setCursor(15,3);
   lcd.print("   ");
-  lcd.setCursor(15,3);
-  lcd.print(menu4_Value); //  
+  //lcd.setCursor(15,3);
+ // lcd.print(menu4_Value); //  
 }
 
 void updateCursorPosition(){
@@ -410,6 +451,15 @@ void updateSelection()
   if(menu4_selected == true)
   {
     lcd.setCursor(0,3); //4th line, 1st block
-    lcd.print("X"); 
+    lcd.print("X");
+    
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(menu2_Value);
+    Wire.write(1); // 1 = motor1(tilt motor)
+    Wire.endTransmission();
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(menu3_Value);
+    Wire.write(2); // 2 = motor2 (index motor)...3 = motor2 (index motor by 360/n)
+    Wire.endTransmission();   
   }
 }
