@@ -21,7 +21,7 @@ bool menu4_selected = false;
 //Defining pins
 //Arduino interrupt pin: 2, 3.
 const int RotaryCLK = 2; //CLK pin on the rotary encoder
-const int RotaryDT = 11; //DT pin on the rotary encoder
+const int RotaryDT = 12; //DT pin on the rotary encoder
 const int PushButton = 3; //Button to enter/exit menu
 
 //Statuses for the rotary encoder
@@ -75,7 +75,7 @@ void loop()
     updateLCD(); // ... we update the LCD ...
 
     //... also, if one of the menus are already selected...
-    if(menu1_selected == true || menu2_selected == true || menu3_selected == true || menu4_selected == true)
+    if(/*menu1_selected == true ||*/ menu2_selected == true || menu3_selected == true || menu4_selected == true)
     {
      // do nothing
     }
@@ -97,6 +97,7 @@ void loop()
 void rotate()
 {  
   //-----MENU1--------------------------------------------------------------
+  /*
   if(menu1_selected == true)
   {
   CLKNow = digitalRead(RotaryCLK); //Read the state of the CLK pin
@@ -105,7 +106,7 @@ void rotate()
   {
     // If the DT state is different than the CLK state then
     // the encoder is rotating in A direction, so we increase
-    if (digitalRead(RotaryDT) != CLKNow) 
+    if (digitalRead(RotaryDT) == CLKNow) 
     {
       if(menu1_Value < 100) //we do not go above 100
       {
@@ -131,8 +132,9 @@ void rotate()
   }
   CLKPrevious = CLKNow;  // Store last CLK state
   }
+  */
   //---MENU2---------------------------------------------------------------
-  else if(menu2_selected == true)
+  if(menu2_selected == true)
   {
     CLKNow = digitalRead(RotaryCLK); //Read the state of the CLK pin
   // If last and current state of CLK are different, then a pulse occurred  
@@ -175,7 +177,7 @@ void rotate()
   {
     // If the DT state is different than the CLK state then
     // the encoder is rotating in A direction, so we increase
-    if (digitalRead(RotaryDT) != CLKNow) 
+    if (digitalRead(RotaryDT) == CLKNow) 
     {
       if(menu3_Value < 100) //we do not go above 100
       {
@@ -210,7 +212,7 @@ void rotate()
   {
     // If the DT state is different than the CLK state then
     // the encoder is rotating in A direction, so we increase
-    if (digitalRead(RotaryDT) != CLKNow) 
+    if (digitalRead(RotaryDT) == CLKNow) 
     {
       if(menu4_Value < 100) //we do not go above 100
       {
@@ -244,22 +246,22 @@ void rotate()
   {
     // If the DT state is different than the CLK state then
     // the encoder is rotating in A direction, so we increase
-    if (digitalRead(RotaryDT) != CLKNow) 
+    if (digitalRead(RotaryDT) == CLKNow) 
     {
-      if(menuCounter < 3) //we do not go above 3
+      if(menuCounter < 2) //we do not go above 3
       {
         menuCounter++;  
       }
       else
       {
-        menuCounter = 0;  
+        menuCounter = 1;  
       }      
     } 
     else 
     {
-      if(menuCounter < 1) //we do not go below 0
+      if(menuCounter < 2) //we do not go below 0
       {
-          menuCounter = 3;
+          menuCounter = 2;
       }
       else
       {
