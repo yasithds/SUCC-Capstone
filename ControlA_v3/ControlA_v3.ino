@@ -123,15 +123,39 @@ void loop()
   if (key) {                                    // If getKey returned any key
     Serial.println(key);                        // it is printed on the serial monitor   
   }
+  
   if (key=='*' && index_type ==0){
     lcd.setCursor(1,2);            
     lcd.print("Index Amount");
-    index_type=1; 
+    index_type=1;
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(00);
+    Wire.write(0); //update indexing type
+    Wire.endTransmission();   
   }else if (key=='*' && index_type ==1){
     lcd.setCursor(1,2);            
     lcd.print("Index Angle ");
     index_type=0; 
-  }
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(00);
+    Wire.write(0); //update indexing type
+    Wire.endTransmission();  
+  } 
+  if (key=='A'){
+    //Serial.println(key);
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(00);
+    Wire.write(1); //1 = index
+    Wire.endTransmission();  
+      
+  } else if (key=='#'){
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(00);
+    Wire.write(9); //9 = demo
+    Wire.endTransmission();  
+  } 
   
 }
 
@@ -185,7 +209,7 @@ void rotate()
     // the encoder is rotating in A direction, so we increase
     if (digitalRead(RotaryDT) == CLKNow) 
     {
-      if(menu2_Value < 100) //we do not go above 100
+      if(menu2_Value < 90) //we do not go above 100
       {
         menu2_Value++;  
       }
@@ -198,7 +222,7 @@ void rotate()
     {
       if(menu2_Value < 1) //we do not go below 0
       {
-          menu2_Value = 100;
+          menu2_Value = 90;
       }
       else
       {
@@ -220,7 +244,7 @@ void rotate()
     // the encoder is rotating in A direction, so we increase
     if (digitalRead(RotaryDT) == CLKNow) 
     {
-      if(menu3_Value < 100) //we do not go above 100
+      if(menu3_Value < 180) //we do not go above 100
       {
         menu3_Value++;  
       }
@@ -233,7 +257,7 @@ void rotate()
     {
       if(menu3_Value < 1) //we do not go below 0
       {
-          menu3_Value = 100;
+          menu3_Value = 180;
       }
       else
       {
@@ -247,6 +271,7 @@ void rotate()
   //---MENU4----------------------------------------------------------------
   else if(menu4_selected == true)
   {
+    /*
     CLKNow = digitalRead(RotaryCLK); //Read the state of the CLK pin
   // If last and current state of CLK are different, then a pulse occurred  
   if (CLKNow != CLKPrevious  && CLKNow == 1)
@@ -278,6 +303,8 @@ void rotate()
     }    
   }
   CLKPrevious = CLKNow;  // Store last CLK state 
+  */
+ 
   }
   else //MENU COUNTER----------------------------------------------------------------------------
   {
@@ -451,15 +478,19 @@ void updateSelection()
   if(menu4_selected == true)
   {
     lcd.setCursor(0,3); //4th line, 1st block
-    lcd.print("X");
+    lcd.print("    ...Running...");
+    
     
     Wire.beginTransmission(SLAVE_ADDR);
     Wire.write(menu2_Value);
-    Wire.write(1); // 1 = motor1(tilt motor)
-    Wire.endTransmission();
-    Wire.beginTransmission(SLAVE_ADDR);
+    //Wire.write(1); // 1 = motor1(tilt motor)
     Wire.write(menu3_Value);
     Wire.write(2); // 2 = motor2 (index motor)...3 = motor2 (index motor by 360/n)
-    Wire.endTransmission();   
+    Wire.endTransmission();
+    
+    delay(5000);
+    menu4_selected =false;
+    lcd.setCursor(0,3); //4th line, 1st block
+    lcd.print(">Confirm          ");
   }
 }

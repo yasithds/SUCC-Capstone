@@ -11,13 +11,20 @@
 #define motor2 3
 #define motor2_dir 6
 
+//keypress modes
+// 0= change indexing mode
+// 1= index
+// 2= motor1 tilt
+// 9= demo mode
 
 String data ="";
 int angle =0;
-int stepNum;
+int stepNum_angle;
+int stepNum_tilt;
 int tilt = 0;
 int ratio=1;// gear ratio (40)
 int indexAngle=0;
+int index_type =0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -48,25 +55,81 @@ void receiveEvent(int howMany){
   while(1 < Wire.available()){
     c = Wire.read();          
     Serial.print(c);             
-    //data += c;//used to determine the angle (in degrees)
+    data += c;//used to determine the angle (in degrees)
   }
-
+  
   int action = Wire.read(); // determines the actual motor to manipulate
   Serial.println(action);
 
+  tilt = (data.substring(0,2)).toInt();
+  angle = (data.substring(2)).toInt();
+  Serial.print("tilt ");
+  Serial.println(tilt);
+    Serial.print("anlge ");
+  Serial.println(angle);
   //angle = data.toInt();
   
-  if (action == 1){ //motor 1 = tilt
+  if (action ==0) {
+    if (index_type ==0){
+        index_type =1; // amount
+        stepNum_angle = (360/angle)*(200*40);
+      } else {
+        index_type =0; // angle
+        stepNum_angle = map(angle, 0, 180, 0, (200/2)*40);
+      }
+  }
+    
+  stepNum_tilt = map(tilt, 0, 90, 0, (200/4)*40);
+  
+  if (action ==1) {
+    //index
+    for(int x = 0; x<stepNum_angle; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(500);
+    }
+  }else if (action == 2){ //motor2 = tilt
+  
+    //tilt
+    for(int x = 0; x<stepNum_tilt; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+  }  else if (action == 9){ //demo mode
+  
+    //tilt
+    for(int x = 0; x<(200/4)*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+    delay(1000);
+    digitalWrite(motor2_dir,LOW);
+    for(int x = (200/4)*40; x>0; x--) { // loop for steps
+      digitalWrite(motor2_dir,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+    delay(1000);
+        for(int x = 0; x<200*40; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(500);
+    }
+  }  
 
-   for(int x = 0; x<200; x++) { // loop for 200 steps
-  digitalWrite(motor1,HIGH);
-  delayMicroseconds(500);
-  digitalWrite(motor1,LOW); 
-  delayMicroseconds(500);
- }
 
 
-   
+
+  
+
+   /*
     stepNum = map(c, -90, 90, (-200/4)*ratio, (200/4)*ratio);
     if (stepNum >= tilt && stepNum+tilt <= ratio){ //50* (1:40) from gearing
       
@@ -105,8 +168,11 @@ void receiveEvent(int howMany){
   } else {
     // Continue with current index
     // motor2.step(stepNum, FORWARD, SINGLE);
-  }
+  
+  */
+  
 } 
+
 
 
 
@@ -120,5 +186,5 @@ void loop() {
   // motor2.step(200, FORWARD, SINGLE);
   //Serial.println(data);
 
-  delay(1000);
+  delay(200);
 }
