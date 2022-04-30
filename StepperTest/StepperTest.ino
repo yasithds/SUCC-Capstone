@@ -15,9 +15,13 @@
 // 0= change indexing mode
 // 1= index
 // 2= motor1 tilt
+// 3= 15
+// 4 = 30
+// 5 = 45
 // 9= demo mode
 
 String data ="";
+int data_int;
 int angle =0;
 int stepNum_angle;
 int stepNum_tilt;
@@ -61,6 +65,7 @@ void receiveEvent(int howMany){
   int action = Wire.read(); // determines the actual motor to manipulate
   Serial.println(action);
 
+  data_int = data.toInt();
   tilt = (data.substring(0,2)).toInt();
   angle = (data.substring(2)).toInt();
   Serial.print("tilt ");
@@ -73,56 +78,119 @@ void receiveEvent(int howMany){
     if (index_type ==0){
         index_type =1; // amount
         stepNum_angle = (360/angle)*(200*40);
+       
       } else {
         index_type =0; // angle
         stepNum_angle = map(angle, 0, 180, 0, (200/2)*40);
       }
+      
+    
   }
     
-  stepNum_tilt = map(tilt, 0, 90, 0, (200/4)*40);
+  stepNum_tilt = map(tilt, 0, 90, 0, (200/4)*90);
   
   if (action ==1) {
     //index
     for(int x = 0; x<stepNum_angle; x++) { // loop for steps
-      digitalWrite(motor1,HIGH);
-      delayMicroseconds(500);
-      digitalWrite(motor1,LOW); 
-      delayMicroseconds(500);
-    }
-  }else if (action == 2){ //motor2 = tilt
-  
-    //tilt
-    for(int x = 0; x<stepNum_tilt; x++) { // loop for steps
       digitalWrite(motor2,HIGH);
       delayMicroseconds(500);
       digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+  } else if (action == 2){ //motor1 = tilt
+  
+    //tilt
+    for(int x = 0; x<stepNum_tilt; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor1,LOW); 
       delayMicroseconds(500);
     }
   }  else if (action == 9){ //demo mode
   
     //tilt
     for(int x = 0; x<(200/4)*40; x++) { // loop for steps
-      digitalWrite(motor2,HIGH);
-      delayMicroseconds(500);
-      digitalWrite(motor2,LOW); 
-      delayMicroseconds(500);
-    }
-    delay(1000);
-    digitalWrite(motor2_dir,LOW);
-    for(int x = (200/4)*40; x>0; x--) { // loop for steps
-      digitalWrite(motor2_dir,HIGH);
-      delayMicroseconds(500);
-      digitalWrite(motor2,LOW); 
-      delayMicroseconds(500);
-    }
-    delay(1000);
-        for(int x = 0; x<200*40; x++) { // loop for steps
       digitalWrite(motor1,HIGH);
       delayMicroseconds(500);
       digitalWrite(motor1,LOW); 
       delayMicroseconds(500);
     }
-  }  
+    delay(1000);
+    digitalWrite(motor1_dir,LOW);
+    for(int x = (200/4)*40; x>0; x--) { // loop for steps
+      digitalWrite(motor1_dir,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(500);
+    }
+    delay(1000);
+    /*
+        for(int x = 0; x<200*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+      */
+    } else if (action ==3) { //15
+    //index
+    for(int x = 0; x<200*15/360*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+  } else if (action ==4) { //30
+    //index
+    for(int x = 0; x<200*30/360*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+    
+  }else if (action ==5) { // 45
+    //index
+    for(int x = 0; x<200*45/360*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+  } else if (action ==6) { //90
+    //index
+    for(int x = 0; x<200*90/360*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+  } else if (action ==7) { //180
+    //index
+    for(int x = 0; x<200*0.5*40; x++) { // loop for steps
+      digitalWrite(motor2,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor2,LOW); 
+      delayMicroseconds(500);
+    }
+  }  else if (action ==8) { //360
+    //index
+      digitalWrite(motor1_dir, HIGH);
+    for(int x = 0; x<200*0.125*90; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(600);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(600);
+    }
+  } else if (action ==9) { //360
+    //index
+      digitalWrite(motor1_dir, LOW);
+    for(int x = 0; x<200*90; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(600);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(600);
+    }
+  } 
 
 
 
@@ -186,5 +254,32 @@ void loop() {
   // motor2.step(200, FORWARD, SINGLE);
   //Serial.println(data);
 
-  delay(200);
+  //index
+
+  /*
+
+     digitalWrite(motor1_dir, HIGH);
+     for(int x = 0; x<200*40; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(500);
+    }
+    delay(1000);
+        //index
+     digitalWrite(motor1_dir, LOW);
+     for(int x = 0; x<200*40; x++) { // loop for steps
+      digitalWrite(motor1,HIGH);
+      delayMicroseconds(500);
+      digitalWrite(motor1,LOW); 
+      delayMicroseconds(500);
+    }
+    */
+   
+   
+    
+  delay(2000);
+  //tilt
+//digitalWrite(motor1_dir,HIGH); //high = rotate up
+
 }

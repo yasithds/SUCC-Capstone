@@ -130,6 +130,7 @@ void loop()
     index_type=1;
     Wire.beginTransmission(SLAVE_ADDR);
     Wire.write(00);
+    Wire.write(menu3_Value);
     Wire.write(0); //update indexing type
     Wire.endTransmission();   
   }else if (key=='*' && index_type ==1){
@@ -137,6 +138,7 @@ void loop()
     lcd.print("Index Angle ");
     index_type=0; 
     Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(00);
     Wire.write(00);
     Wire.write(0); //update indexing type
     Wire.endTransmission();  
@@ -146,16 +148,63 @@ void loop()
     Serial.println("INDEX");
     Wire.beginTransmission(SLAVE_ADDR);
     Wire.write(00);
+    Wire.write(menu3_Value);
     Wire.write(1); //1 = index
     Wire.endTransmission();  
       
   } else if (key=='#'){
     Serial.println("INDEX");
     Wire.beginTransmission(SLAVE_ADDR);
-    Wire.write(00);
+    Wire.write(0000);
     Wire.write(9); //9 = demo
     Wire.endTransmission();  
-  } 
+    
+  } else if (key=='1'){ //15
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(3); //9 = demo
+    Wire.endTransmission();  
+  }  else if (key=='2'){ //30
+    Serial.println("INDEX"); 
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(4); //9 = demo
+    Wire.endTransmission();  
+  }  
+  else if (key=='3'){ /// 45
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(5); //9 = demo
+    Wire.endTransmission();  
+  }   else if (key=='4'){ //90
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(6); //9 = demo
+    Wire.endTransmission();  
+  }  else if (key=='5'){ 
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(7); //9 = demo
+    Wire.endTransmission();  
+  }  else if (key=='#'){ 
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(9); //9 = demo
+    Wire.endTransmission();  
+  } else if (key=='C'){ 
+    Serial.println("INDEX");
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(0000);
+    Wire.write(8); //9 = demo
+    Wire.endTransmission();  
+  }
+
+
   
 }
 
